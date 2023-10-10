@@ -3,14 +3,16 @@ import logo from "./logo.svg";
 import "./App.css";
 import { Button, Container } from "@mui/material";
 
-import MarketDataProvider from "./utils/Market";
+import { TeamsPlayersPropsProvider } from "./utils/TeamsPlayersProvider";
 import PropsTable from "./components/PropsTable";
+import HeaderAppBar from "./components/HeaderAppBar";
 
 function App() {
   return (
     <div className="App">
+      <HeaderAppBar />
       <Container>
-        <MarketDataProvider>
+        <TeamsPlayersPropsProvider>
           <Button
             onClick={() => {
               console.log("Clicky");
@@ -19,7 +21,7 @@ function App() {
             Lemma at em!
           </Button>
           <PropsTable />
-        </MarketDataProvider>
+        </TeamsPlayersPropsProvider>
       </Container>
     </div>
   );
