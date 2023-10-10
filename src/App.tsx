@@ -4,7 +4,7 @@ import "./App.css";
 import { Button, Container } from "@mui/material";
 
 import { TeamsPlayersPropsProvider } from "./utils/TeamsPlayersProvider";
-import PropsTable from "./components/PropsTable";
+import GameContainer from "./components/GameContainer";
 import HeaderAppBar from "./components/HeaderAppBar";
 
 function App() {
@@ -13,14 +13,7 @@ function App() {
       <HeaderAppBar />
       <Container>
         <TeamsPlayersPropsProvider>
-          <Button
-            onClick={() => {
-              console.log("Clicky");
-            }}
-          >
-            Lemma at em!
-          </Button>
-          <PropsTable />
+          <GameContainer />
         </TeamsPlayersPropsProvider>
       </Container>
     </div>
