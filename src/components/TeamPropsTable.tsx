@@ -1,4 +1,4 @@
-import { Children, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   TableContainer,
   Paper,
@@ -81,13 +81,13 @@ function PlayerMarketRow(props: {
     }
 
     setIsShowing(true);
-  }, [filters, marketSuspended]);
+  }, [filters, marketSuspended, prop]);
 
   if (!isShowing) return null;
 
   const forceShowPlayerName =
-    // (filters.marketStatus && filters.marketStatus > -1) ||
-    filters.statTypeId && filters.statTypeId > -1;
+    (filters.marketStatus !== undefined && filters.marketStatus > -1) ||
+    (filters.statTypeId && filters.statTypeId > -1);
 
   const isTopRowForPlayer = showPlayerName || forceShowPlayerName;
 
@@ -107,7 +107,6 @@ function PlayerMarketRow(props: {
         <b>{prop.line}</b>
       </TableCell>
       <TableCell>{prop.highAlternate?.line ?? "-"}</TableCell>
-      {/* <TableCell>{isShowing ? "SHOW" : "HIDE"}</TableCell> */}
 
       {marketSuspended ? (
         <TableCell>
@@ -167,9 +166,11 @@ export default function TeamPropsTable({ team }: { team: Team }) {
             return createPlayerRows(player);
           })}
           <TableRow className={"onlyChildShow"}>
-            <Typography sx={{ margin: 2, color: "gray" }}>
-              No available lines.
-            </Typography>
+            <TableCell>
+              <Typography sx={{ margin: 2, color: "gray" }}>
+                No available lines.
+              </Typography>
+            </TableCell>
           </TableRow>
         </TableBody>
       </Table>

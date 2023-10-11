@@ -1,5 +1,4 @@
-import { Grid, Paper, Typography } from "@mui/material";
-import React from "react";
+import { Grid, Typography } from "@mui/material";
 import { useTeamsPlayersProps } from "../utils/TeamsPlayersProvider";
 import TeamPropsTable from "./TeamPropsTable";
 
@@ -10,20 +9,21 @@ export default function GameContainer() {
   const teamIds = teams ? Object.keys(teams) : [];
 
   return (
-    <Grid container xs={12} spacing={2} sx={{ marginTop: 4 }}>
+    <Grid container spacing={2} sx={{ marginTop: 4 }}>
       {teamIds.map((teamId) => {
         const team = teams ? teams[teamId] : null;
-        if (team !== null)
-          return (
-            teams && (
-              <Grid item xs={12}>
-                <Typography textAlign={"left"} variant="h5">
-                  {team.teamNickname}
-                </Typography>
-                <TeamPropsTable team={team} />
-              </Grid>
-            )
-          );
+
+        if (team === null) return null;
+        return (
+          teams && (
+            <Grid item xs={12} key={team.teamNickname}>
+              <Typography textAlign={"left"} variant="h5">
+                {team.teamNickname}
+              </Typography>
+              <TeamPropsTable team={team} />
+            </Grid>
+          )
+        );
       })}
     </Grid>
   );

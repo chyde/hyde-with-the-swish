@@ -1,7 +1,5 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
-import { Button, Container } from "@mui/material";
+import { Container } from "@mui/material";
 
 import { TeamsPlayersPropsProvider } from "./utils/TeamsPlayersProvider";
 import GameContainer from "./components/GameContainer";

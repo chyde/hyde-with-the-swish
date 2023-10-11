@@ -1,10 +1,7 @@
 import {
   alpha,
   AppBar,
-  Box,
   InputBase,
-  TextField,
-  Toolbar,
   Typography,
   styled,
   Grid,
@@ -12,9 +9,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
-  makeStyles,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTeamsPlayersProps } from "../utils/TeamsPlayersProvider";
 import { useFilters } from "../utils/FiltersProvider";
@@ -63,17 +58,6 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
-const selectStyles = {
-  // height: "2.5rem",
-  color: "white",
-  "& .MuiOutlinedInput-notchedOutline": {
-    borderColor: "white",
-  },
-  "& .MuiSvgIcon-root": {
-    color: "white",
-  },
-};
-
 export default function HeaderAppBar() {
   const {
     teamsPlayersProps: teams,
@@ -97,7 +81,7 @@ export default function HeaderAppBar() {
     <>
       <AppBar position="fixed" sx={appBarStyle}>
         <Grid container spacing={1}>
-          <Grid item xs={3}>
+          <Grid key={pageTite} item xs={3}>
             <Typography
               variant="h6"
               component="div"
@@ -108,13 +92,16 @@ export default function HeaderAppBar() {
           </Grid>
           <Grid
             item
+            key={"filters"}
             xs={6}
             boxShadow={1}
             borderRadius={1}
             paddingBottom={1}
+            display={"flex"}
+            justifyContent={"space-evenly"}
             sx={{ backgroundColor: "white", textAlign: "left" }}
           >
-            <FormControl>
+            <FormControl key={"stat-type"}>
               <InputLabel id="select-label-stat-type">Stat Type</InputLabel>
               <Select
                 labelId="select-label-stat-type"
@@ -123,17 +110,20 @@ export default function HeaderAppBar() {
                 label="Stat Type"
                 onChange={(target) => {
                   const newStatTypeId: number = Number(target.target.value);
-                  console.log(newStatTypeId);
                   updateFilters({ statTypeId: newStatTypeId });
                 }}
               >
                 <MenuItem value={-1}>ANY</MenuItem>
                 {statTypes.map((statType) => {
-                  return <MenuItem value={statType[0]}>{statType[1]}</MenuItem>;
+                  return (
+                    <MenuItem key={statType[1]} value={statType[0]}>
+                      {statType[1]}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
-            <FormControl>
+            <FormControl key={"pos-type"}>
               <InputLabel id="select-label-position">Stat Type</InputLabel>
               <Select
                 labelId="select-label-position"
@@ -142,17 +132,22 @@ export default function HeaderAppBar() {
                 label="Position"
                 onChange={(target) => {
                   const position = target.target.value;
-                  console.log(position);
                   updateFilters({ position: position });
                 }}
               >
-                <MenuItem value={"ANY"}>ANY</MenuItem>
+                <MenuItem key={"ANY"} value={"ANY"}>
+                  ANY
+                </MenuItem>
                 {positions.map((position) => {
-                  return <MenuItem value={position}>{position}</MenuItem>;
+                  return (
+                    <MenuItem key={position} value={position}>
+                      {position}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
-            <FormControl>
+            <FormControl key={"market-status-type"}>
               <InputLabel id="select-label-market-status">
                 Market status
               </InputLabel>
@@ -165,17 +160,24 @@ export default function HeaderAppBar() {
                 label="Market status"
                 onChange={(target) => {
                   const marketStatus = Number(target.target.value);
-                  console.log(marketStatus, filters);
                   updateFilters({ marketStatus: marketStatus });
                 }}
               >
-                <MenuItem value={-1}>ANY</MenuItem>
-                <MenuItem value={0}>{"Released"}</MenuItem>;
-                <MenuItem value={1}>{"Suspended"}</MenuItem>;
+                <MenuItem key={"ANY"} value={-1}>
+                  ANY
+                </MenuItem>
+                <MenuItem key={"Released"} value={0}>
+                  {"Released"}
+                </MenuItem>
+                ;
+                <MenuItem key={"Suspended"} value={1}>
+                  {"Suspended"}
+                </MenuItem>
+                ;
               </Select>
             </FormControl>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={3} key={"search"}>
             <Search sx={{ flexGrow: 2 }}>
               <SearchIconWrapper>
                 <SearchIcon />

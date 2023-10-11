@@ -1,6 +1,4 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { useTeamsPlayersProps } from "./TeamsPlayersProvider";
-import { TeamsPlayerPropType } from "./MarketTypes";
 
 export type FiltersType = {
   searchString?: string;
