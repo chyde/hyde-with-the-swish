@@ -6,38 +6,13 @@ import {
   ReactNode,
 } from "react";
 
-import { getProps } from "../api/fake-api";
-
-export type MarketPropType = {
-  playerName: string;
-  playerId: number;
-  teamId: number;
-  teamNickname: string;
-  teamAbbr: string;
-  statType: string;
-  statTypeId: number;
-  position: string;
-  marketSuspended: 0 | 1 | number;
-  line: number;
-};
-
-export type Player = {
-  playerName: string;
-  playerId: number;
-  position: string;
-  props: MarketPropType[];
-};
-
-export type Team = {
-  teamId: number;
-  teamNickname: string;
-  teamAbbr: string;
-  players: { [key: string]: Player };
-};
-
-export type TeamsPlayerPropType = {
-  [key: string]: Team;
-};
+import { getProps, getAlternates } from "../api/fake-api";
+import {
+  MarketPropType,
+  MarketAlternateType,
+  TeamsPlayerPropType,
+  PlayerMarketAlternatesType,
+} from "./MarketTypes";
 
 const TeamsPlayersPropsContext = createContext<TeamsPlayerPropType | null>({});
 // TODO: implement loading feature to show loading state
@@ -46,6 +21,8 @@ const marketPropsToTeamPlayerProps = (
   propMarkets: MarketPropType[]
 ): TeamsPlayerPropType => {
   const teams: TeamsPlayerPropType = {};
+
+  const alternates = mapPlayerAlternates();
 
   propMarkets.forEach((market) => {
     if (!teams[market.teamId]) {
@@ -58,18 +35,64 @@ const marketPropsToTeamPlayerProps = (
     }
 
     if (!teams[market.teamId]?.players[market.playerId]) {
+      const playerAlts: { [key: string]: MarketAlternateType[] } = {};
+
+      alternates[market.playerId]?.forEach((alt) => {
+        if (!playerAlts[alt.statTypeId]) {
+          playerAlts[alt.statTypeId] = [];
+        }
+        playerAlts[alt.statTypeId].push(alt);
+      });
+
       teams[market.teamId].players[market.playerId] = {
         playerName: market.playerName,
         playerId: market.playerId,
         position: market.position,
         props: [],
+        alternates: playerAlts,
       };
     }
+    let altOptimal: MarketAlternateType | undefined = undefined;
+    let altLow: MarketAlternateType | undefined = undefined;
+    let altHigh: MarketAlternateType | undefined = undefined;
+    teams[market.teamId].players[market.playerId].alternates[
+      market.statTypeId
+    ]?.forEach((alt) => {
+      if (alt.line === market.line) {
+        altOptimal = alt;
+      }
+      if (altLow === undefined || alt.line < altLow.line) {
+        altLow = alt;
+      }
+      if (altHigh === undefined || alt.line > altHigh.line) {
+        altHigh = alt;
+      }
+    });
 
-    teams[market.teamId].players[market.playerId].props.push(market);
+    teams[market.teamId].players[market.playerId].props.push({
+      ...market,
+      optimalAlternate: altOptimal,
+      highAlternate: altHigh,
+      lowAlternate: altLow,
+    });
   });
 
   return teams;
+};
+
+const mapPlayerAlternates = (): PlayerMarketAlternatesType => {
+  const alternates: MarketAlternateType[] = getAlternates();
+  const playerAlternates: PlayerMarketAlternatesType = {};
+
+  alternates.forEach((alternate) => {
+    if (!playerAlternates[alternate.playerId]) {
+      playerAlternates[alternate.playerId] = [];
+    }
+
+    playerAlternates[alternate.playerId].push(alternate);
+  });
+
+  return playerAlternates;
 };
 
 export function TeamsPlayersPropsProvider({
@@ -82,10 +105,8 @@ export function TeamsPlayersPropsProvider({
 
   useEffect(() => {
     const propsData = getProps(); // Normally, this would be some API call
-
     setTeamsPlayersProps(marketPropsToTeamPlayerProps(propsData));
   }, []);
-  // TODO: implelment a useReducer() for fake data management
 
   return (
     <TeamsPlayersPropsContext.Provider value={teamsPlayersProps}>

@@ -6,16 +6,19 @@ import { Button, Container } from "@mui/material";
 import { TeamsPlayersPropsProvider } from "./utils/TeamsPlayersProvider";
 import GameContainer from "./components/GameContainer";
 import HeaderAppBar from "./components/HeaderAppBar";
+import FiltersProvider from "./utils/FiltersProvider";
 
 function App() {
   return (
     <div className="App">
-      <HeaderAppBar />
-      <Container>
-        <TeamsPlayersPropsProvider>
-          <GameContainer />
-        </TeamsPlayersPropsProvider>
-      </Container>
+      <TeamsPlayersPropsProvider>
+        <FiltersProvider>
+          <HeaderAppBar />
+          <Container>
+            <GameContainer />
+          </Container>
+        </FiltersProvider>
+      </TeamsPlayersPropsProvider>
     </div>
   );
 }
