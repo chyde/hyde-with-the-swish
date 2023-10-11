@@ -7,6 +7,12 @@ import {
   Toolbar,
   Typography,
   styled,
+  Grid,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  makeStyles,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
@@ -57,8 +63,23 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
+const selectStyles = {
+  // height: "2.5rem",
+  color: "white",
+  "& .MuiOutlinedInput-notchedOutline": {
+    borderColor: "white",
+  },
+  "& .MuiSvgIcon-root": {
+    color: "white",
+  },
+};
+
 export default function HeaderAppBar() {
-  const teams = useTeamsPlayersProps();
+  const {
+    teamsPlayersProps: teams,
+    statTypes,
+    positions,
+  } = useTeamsPlayersProps();
   const { filters, updateFilters } = useFilters();
 
   const pageTite = teams
@@ -75,26 +96,101 @@ export default function HeaderAppBar() {
   return (
     <>
       <AppBar position="fixed" sx={appBarStyle}>
-        <Typography
-          variant="h6"
-          component="div"
-          sx={{ flexGrow: 1, textAlign: "left" }}
-        >
-          {pageTite}
-        </Typography>
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder="Search…"
-            inputProps={{ "aria-label": "search" }}
-            onChange={(target) => {
-              const newSearchTerm = target.target.value;
-              updateFilters({ searchString: newSearchTerm });
-            }}
-          />
-        </Search>
+        <Grid container spacing={1}>
+          <Grid item xs={3}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, textAlign: "left" }}
+            >
+              {pageTite}
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={6}
+            boxShadow={1}
+            borderRadius={1}
+            paddingBottom={1}
+            sx={{ backgroundColor: "white", textAlign: "left" }}
+          >
+            <FormControl>
+              <InputLabel id="select-label-stat-type">Stat Type</InputLabel>
+              <Select
+                labelId="select-label-stat-type"
+                id="select-stat-type"
+                value={filters.statTypeId || -1}
+                label="Stat Type"
+                onChange={(target) => {
+                  const newStatTypeId: number = Number(target.target.value);
+                  console.log(newStatTypeId);
+                  updateFilters({ statTypeId: newStatTypeId });
+                }}
+              >
+                <MenuItem value={-1}>ANY</MenuItem>
+                {statTypes.map((statType) => {
+                  return <MenuItem value={statType[0]}>{statType[1]}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="select-label-position">Stat Type</InputLabel>
+              <Select
+                labelId="select-label-position"
+                id="select-position"
+                value={filters.position || "ANY"}
+                label="Position"
+                onChange={(target) => {
+                  const position = target.target.value;
+                  console.log(position);
+                  updateFilters({ position: position });
+                }}
+              >
+                <MenuItem value={"ANY"}>ANY</MenuItem>
+                {positions.map((position) => {
+                  return <MenuItem value={position}>{position}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <InputLabel id="select-label-market-status">
+                Market status
+              </InputLabel>
+              <Select
+                labelId="select-label-market-status"
+                id="select-market-status"
+                value={
+                  filters.marketStatus === undefined ? -1 : filters.marketStatus
+                }
+                label="Market status"
+                onChange={(target) => {
+                  const marketStatus = Number(target.target.value);
+                  console.log(marketStatus, filters);
+                  updateFilters({ marketStatus: marketStatus });
+                }}
+              >
+                <MenuItem value={-1}>ANY</MenuItem>
+                <MenuItem value={0}>{"Released"}</MenuItem>;
+                <MenuItem value={1}>{"Suspended"}</MenuItem>;
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <Search sx={{ flexGrow: 2 }}>
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search…"
+                inputProps={{ "aria-label": "search" }}
+                onChange={(target) => {
+                  const newSearchTerm = target.target.value;
+                  updateFilters({ searchString: newSearchTerm });
+                }}
+              />
+            </Search>
+          </Grid>
+        </Grid>
       </AppBar>
       <Offset />
     </>

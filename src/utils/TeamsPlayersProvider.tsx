@@ -14,13 +14,23 @@ import {
   PlayerMarketAlternatesType,
 } from "./MarketTypes";
 
-const TeamsPlayersPropsContext = createContext<TeamsPlayerPropType | null>({});
+const TeamsPlayersPropsContext = createContext<{
+  teamsPlayersProps: TeamsPlayerPropType | null;
+  statTypes: [string, string][];
+  positions: string[];
+}>({
+  teamsPlayersProps: null,
+  statTypes: [],
+  positions: [],
+});
 // TODO: implement loading feature to show loading state
 
 const marketPropsToTeamPlayerProps = (
   propMarkets: MarketPropType[]
-): TeamsPlayerPropType => {
+): [TeamsPlayerPropType, [string, string][], string[]] => {
   const teams: TeamsPlayerPropType = {};
+  const positions: { [name: string]: true } = {};
+  const statTypes: { [id: number]: string } = {};
 
   const alternates = mapPlayerAlternates();
 
@@ -75,9 +85,24 @@ const marketPropsToTeamPlayerProps = (
       highAlternate: altHigh,
       lowAlternate: altLow,
     });
+
+    // account for all market stat types
+    if (statTypes[market.statTypeId] === undefined) {
+      statTypes[market.statTypeId] = market.statType;
+    }
+    if (positions[market.position] === undefined) {
+      positions[market.position] = true;
+    }
   });
 
-  return teams;
+  const statTypesList = Object.keys(statTypes).map(
+    (statTypeId): [string, string] => {
+      return [statTypeId, statTypes[parseInt(statTypeId)]];
+    }
+  );
+  const positionsList = Object.keys(positions);
+
+  return [teams, statTypesList, positionsList];
 };
 
 const mapPlayerAlternates = (): PlayerMarketAlternatesType => {
@@ -102,14 +127,23 @@ export function TeamsPlayersPropsProvider({
 }) {
   const [teamsPlayersProps, setTeamsPlayersProps] =
     useState<TeamsPlayerPropType | null>(null);
+  const [statTypes, setStatTypes] = useState<[string, string][]>([]);
+  const [positions, setPositions] = useState<string[]>([]);
 
   useEffect(() => {
     const propsData = getProps(); // Normally, this would be some API call
-    setTeamsPlayersProps(marketPropsToTeamPlayerProps(propsData));
+    const [teamsPlayersProps, statTypesList, positionsList] =
+      marketPropsToTeamPlayerProps(propsData);
+
+    setStatTypes(statTypesList);
+    setPositions(positionsList);
+    setTeamsPlayersProps(teamsPlayersProps);
   }, []);
 
   return (
-    <TeamsPlayersPropsContext.Provider value={teamsPlayersProps}>
+    <TeamsPlayersPropsContext.Provider
+      value={{ teamsPlayersProps, statTypes, positions }}
+    >
       {children}
     </TeamsPlayersPropsContext.Provider>
   );

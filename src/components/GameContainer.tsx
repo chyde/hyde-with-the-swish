@@ -4,12 +4,13 @@ import { useTeamsPlayersProps } from "../utils/TeamsPlayersProvider";
 import TeamPropsTable from "./TeamPropsTable";
 
 export default function GameContainer() {
-  const teams = useTeamsPlayersProps();
+  const { teamsPlayersProps: teams } = useTeamsPlayersProps();
+
   // TODO: "Loading..." state needs to  be implemented
   const teamIds = teams ? Object.keys(teams) : [];
 
   return (
-    <Grid container xs={12} spacing={2} sx={{ marginTop: 2 }}>
+    <Grid container xs={12} spacing={2} sx={{ marginTop: 4 }}>
       {teamIds.map((teamId) => {
         const team = teams ? teams[teamId] : null;
         if (team !== null)

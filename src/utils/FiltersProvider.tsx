@@ -6,7 +6,7 @@ export type FiltersType = {
   searchString?: string;
   position?: string;
   statTypeId?: number;
-  marketStatus?: number; // 0, 1, undefined
+  marketStatus?: number; // 0, 1, -1
 };
 
 type UpdateFiltersType = (newFilters: FiltersType) => void;
@@ -15,7 +15,11 @@ const FiltersContext = createContext<{
   filters: FiltersType;
   updateFilters: UpdateFiltersType;
 }>({
-  filters: {},
+  filters: {
+    position: "ANY",
+    statTypeId: -1,
+    marketStatus: -1,
+  },
   updateFilters: () => {},
 });
 

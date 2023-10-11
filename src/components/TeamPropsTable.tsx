@@ -29,28 +29,6 @@ function PlayerMarketRow(props: {
   const { prop, playerName, showPlayerName = true } = props;
   const { filters } = useFilters();
   const [isShowing, setIsShowing] = useState(true);
-
-  useEffect(() => {
-    if (
-      filters.searchString &&
-      !contains(prop.playerName, filters.searchString) &&
-      !contains(prop.teamNickname, filters.searchString)
-    ) {
-      setIsShowing(false);
-      return;
-    }
-    if (filters.statTypeId && prop.statTypeId !== filters.statTypeId) {
-      setIsShowing(false);
-      return;
-    }
-    if (filters.position && prop.position !== filters.position) {
-      setIsShowing(false);
-      return;
-    }
-
-    setIsShowing(true);
-  }, [filters]);
-
   const isSuspended = prop.marketSuspended === 1;
   let hasNoOptimalAlternate = true;
   let noMinOddsMet = true;
@@ -67,12 +45,61 @@ function PlayerMarketRow(props: {
     isSuspended || hasNoOptimalAlternate || noMinOddsMet
   );
 
+  useEffect(() => {
+    if (
+      filters.searchString &&
+      !contains(prop.playerName, filters.searchString) &&
+      !contains(prop.teamNickname, filters.searchString)
+    ) {
+      setIsShowing(false);
+      return;
+    }
+    if (
+      filters.statTypeId &&
+      filters.statTypeId > -1 &&
+      prop.statTypeId !== filters.statTypeId
+    ) {
+      setIsShowing(false);
+      return;
+    }
+    if (
+      filters.position &&
+      filters.position !== "ANY" &&
+      prop.position !== filters.position
+    ) {
+      setIsShowing(false);
+      return;
+    }
+
+    if (
+      filters.marketStatus !== undefined &&
+      filters.marketStatus !== -1 &&
+      filters.marketStatus !== (marketSuspended ? 1 : 0)
+    ) {
+      setIsShowing(false);
+      return;
+    }
+
+    setIsShowing(true);
+  }, [filters, marketSuspended]);
+
   if (!isShowing) return null;
 
+  const forceShowPlayerName =
+    // (filters.marketStatus && filters.marketStatus > -1) ||
+    filters.statTypeId && filters.statTypeId > -1;
+
+  const isTopRowForPlayer = showPlayerName || forceShowPlayerName;
+
   return (
-    <TableRow sx={{ backgroundColor: marketSuspended ? "#eeeeee" : undefined }}>
-      <TableCell>{showPlayerName ? playerName : null}</TableCell>
-      <TableCell>{showPlayerName ? prop.position : null}</TableCell>
+    <TableRow
+      sx={{
+        borderTopStyle: isTopRowForPlayer ? "solid" : undefined,
+        backgroundColor: marketSuspended ? "#eeeeee" : undefined,
+      }}
+    >
+      <TableCell>{isTopRowForPlayer ? playerName : null}</TableCell>
+      <TableCell>{isTopRowForPlayer ? prop.position : null}</TableCell>
       <TableCell>{prop.statType}</TableCell>
 
       <TableCell>{prop.lowAlternate?.line ?? "-"}</TableCell>
